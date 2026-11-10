@@ -15,9 +15,24 @@ let busy = false;
 let assistantEl = null;
 let reasonEl = null;
 let planEl = null;
+let stepCard = null; // card aberto: chamada da ferramenta + resultado ficam juntos
 let cfg = { model: "-", agent: "nodecode" };
 
 const clip = (s, n) => (String(s).length > n ? String(s).slice(0, n) + " ..." : String(s));
+
+// Cor do badge por tipo de ferramenta (o CSS usa data-kind).
+const KIND = {
+  navigate: "nav", tabs: "nav", fetch_url: "nav",
+  click: "act", type: "act", key: "act", scroll: "act", evaluate: "act",
+  page_state: "look", find: "look", read: "look", screenshot: "look", wait: "look",
+  plan: "think", ask_agent: "think",
+  done: "done",
+};
+
+// A cor neon das opcoes tambem tinge o painel.
+function applyNeon(c) {
+  if (/^#[0-9a-f]{6}$/i.test(c || "")) document.documentElement.style.setProperty("--neon", c);
+}
 
 function addEl(cls, text) {
   const el = document.createElement("div");
@@ -54,6 +69,7 @@ function handle(msg) {
     case "config":
       cfg = { ...cfg, ...(msg.config || {}) };
       metaEl.textContent = `${cfg.agent || "nodecode"} / ${cfg.model || "-"}`;
+      applyNeon(cfg.neon);
       break;
     case "target":
       targetEl.replaceChildren(
@@ -73,10 +89,26 @@ function handle(msg) {
       assistantEl = null;
       reasonEl = null;
       planEl = null;
+      stepCard = null;
       break;
-    case "status":
-      if (msg.text) addEl("msg sys", msg.text);
+    case "status": {
+      if (!msg.text) break;
+      if (/^passo\s+\d+/i.test(msg.text)) {
+        // divisor entre passos; fecha o card anterior
+        stepCard = null;
+        addEl("msg sys pass", msg.text);
+      } else if (stepCard) {
+        // anotacao da execucao (ex.: "ponteiro -> ...") fica dentro do card
+        const note = document.createElement("div");
+        note.className = "msg sys";
+        note.textContent = msg.text;
+        stepCard.appendChild(note);
+        logEl.scrollTop = logEl.scrollHeight;
+      } else {
+        addEl("msg sys", msg.text);
+      }
       break;
+    }
     case "delta": {
       if (!assistantEl) assistantEl = addEl("msg assistant", "");
       assistantEl.textContent += msg.text;
@@ -95,34 +127,61 @@ function handle(msg) {
       break;
     case "plan": {
       if (!planEl) planEl = addEl("plan", "");
-      const head = document.createElement("span");
+      const { steps, done = [], why } = msg.plan;
+      const head = document.createElement("div");
       head.className = "head";
-      head.textContent = `plano ${msg.plan.done.length}/${msg.plan.steps.length}` + (msg.plan.why ? " - " + msg.plan.why : "");
-      const body = document.createElement("span");
-      body.textContent = msg.plan.steps.map((s, i) => `${msg.plan.done.includes(i + 1) ? "[x]" : "[ ]"} ${s}`).join("\n");
+      const label = document.createElement("span");
+      label.textContent = `plano ${done.length}/${steps.length}` + (why ? " - " + why : "");
+      const track = document.createElement("i");
+      track.className = "track";
+      const fill = document.createElement("i");
+      fill.style.width = (steps.length ? Math.round((100 * done.length) / steps.length) : 0) + "%";
+      track.append(fill);
+      head.append(label, track);
+      const body = document.createElement("div");
+      steps.forEach((s, i) => {
+        const row = document.createElement("div");
+        row.className = "pstep" + (done.includes(i + 1) ? " done" : "");
+        row.textContent = s;
+        body.append(row);
+      });
       planEl.replaceChildren(head, body);
-      document.body.dataset.plan = String(msg.plan.steps.length);
+      document.body.dataset.plan = String(steps.length);
       break;
     }
     case "step": {
       document.body.dataset.steps = String((Number(document.body.dataset.steps) || 0) + 1);
-      const el = addEl("step");
+      const card = document.createElement("div");
+      card.className = "step-card" + (msg.tool === "done" ? " done" : "");
+      const el = document.createElement("div");
+      el.className = "step";
       const b = document.createElement("b");
       b.textContent = msg.tool;
+      b.dataset.kind = KIND[msg.tool] || "act";
       const s = document.createElement("span");
       s.className = "res";
       s.textContent = JSON.stringify(msg.args || {}).slice(0, 180);
       el.append(b, s);
+      card.append(el);
+      logEl.appendChild(card);
+      logEl.scrollTop = logEl.scrollHeight;
+      stepCard = card;
       break;
     }
     case "step-result": {
-      const el = addEl("step " + (msg.ok ? "ok" : "bad"));
+      const el = document.createElement("div");
+      el.className = "step " + (msg.ok ? "ok" : "bad");
       const b = document.createElement("b");
       b.textContent = msg.ok ? "ok" : "fail";
       const s = document.createElement("span");
       s.className = "res";
       s.textContent = clip(msg.text || "", 220);
       el.append(b, s);
+      const card = stepCard || logEl.appendChild(Object.assign(document.createElement("div"), { className: "step-card" }));
+      card.append(el);
+      if (!msg.ok) card.classList.add("bad");
+      logEl.scrollTop = logEl.scrollHeight;
+      stepCard = null;
       break;
     }
     case "screenshot": {
@@ -144,6 +203,7 @@ function handle(msg) {
       break;
     case "final":
       document.body.dataset.lastFinal = msg.text || "";
+      stepCard = null;
       if (!msg.text) break;
       if (!assistantEl) assistantEl = addEl("msg assistant", "");
       assistantEl.textContent = msg.text;
@@ -151,6 +211,7 @@ function handle(msg) {
       logEl.scrollTop = logEl.scrollHeight;
       break;
     case "error": {
+      stepCard = null;
       addEl("msg err", msg.text || "erro");
       dot.classList.add("err");
       setTimeout(() => dot.classList.remove("err"), 2600);
@@ -159,12 +220,14 @@ function handle(msg) {
     case "cleared":
       logEl.textContent = "";
       document.body.dataset.lastFinal = "";
+      stepCard = null;
       break;
     case "busy":
       setBusy(!!msg.value);
       break;
     case "turn-end":
       setBusy(false);
+      stepCard = null;
       break;
   }
 }
@@ -255,7 +318,19 @@ chrome.storage.onChanged.addListener((changes) => {
   if (!changes.sp_config) return;
   cfg = { ...cfg, ...(changes.sp_config.newValue || {}) };
   metaEl.textContent = `${cfg.agent || "nodecode"} / ${cfg.model || "-"}`;
+  applyNeon(cfg.neon);
 });
+
+// Atalhos do rodape: clicar num /comando coloca ele no campo.
+document.querySelectorAll(".hint code").forEach((c) => {
+  c.addEventListener("click", () => {
+    ta.value = c.textContent + " ";
+    ta.dispatchEvent(new Event("input"));
+    ta.focus();
+  });
+});
+
+chrome.storage.sync.get("sp_config").then((got) => applyNeon(got.sp_config?.neon)).catch(() => {});
 
 connect();
 ta.focus();

@@ -29,11 +29,6 @@ const KIND = {
   done: "done",
 };
 
-// A cor neon das opcoes tambem tinge o painel.
-function applyNeon(c) {
-  if (/^#[0-9a-f]{6}$/i.test(c || "")) document.documentElement.style.setProperty("--neon", c);
-}
-
 function addEl(cls, text) {
   const el = document.createElement("div");
   el.className = cls;
@@ -69,7 +64,6 @@ function handle(msg) {
     case "config":
       cfg = { ...cfg, ...(msg.config || {}) };
       metaEl.textContent = `${cfg.agent || "nodecode"} / ${cfg.model || "-"}`;
-      applyNeon(cfg.neon);
       break;
     case "target":
       targetEl.replaceChildren(
@@ -318,7 +312,6 @@ chrome.storage.onChanged.addListener((changes) => {
   if (!changes.sp_config) return;
   cfg = { ...cfg, ...(changes.sp_config.newValue || {}) };
   metaEl.textContent = `${cfg.agent || "nodecode"} / ${cfg.model || "-"}`;
-  applyNeon(cfg.neon);
 });
 
 // Atalhos do rodape: clicar num /comando coloca ele no campo.
@@ -329,8 +322,6 @@ document.querySelectorAll(".hint code").forEach((c) => {
     ta.focus();
   });
 });
-
-chrome.storage.sync.get("sp_config").then((got) => applyNeon(got.sp_config?.neon)).catch(() => {});
 
 connect();
 ta.focus();

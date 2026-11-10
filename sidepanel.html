@@ -176,36 +176,44 @@
     border: solid #0a0a0c; border-width: 0 2.5px 2.5px 0;
   }
 
-  /* ---------- entrada ---------- */
+  /* ---------- entrada: um campo so, com o botao dentro ---------- */
   .dock { flex: 0 0 auto; background: var(--bg2); border-top: 2px solid var(--line); }
-  .composer { display: flex; gap: 9px; align-items: flex-end; padding: 12px 12px 8px; }
-  textarea {
-    flex: 1; resize: none; min-height: 44px; max-height: 40vh; padding: 10px 13px; outline: none; font: 600 12.5px/1.45 var(--mono);
-    color: var(--text); background: var(--panel); border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 16px;
+  .composer { padding: 12px 12px 6px; }
+  .field {
+    display: flex; gap: 8px; align-items: flex-end; padding: 6px 6px 6px 14px;
+    background: var(--panel); border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 18px;
     transition: border-color .15s;
   }
+  .field:focus-within { border-color: color-mix(in srgb, var(--pink) 75%, var(--line)); }
+  textarea {
+    flex: 1; min-width: 0; resize: none; min-height: 36px; max-height: 40vh; padding: 8px 0; border: 0; outline: none;
+    font: 600 12.5px/1.45 var(--mono); color: var(--text); background: transparent;
+  }
   textarea::placeholder { color: var(--dim); }
-  textarea:focus { border-color: var(--pink); }
   .send {
-    height: 44px; margin-bottom: 4px; padding: 0 20px; border: 0; border-radius: 14px; cursor: pointer;
-    color: #fff; background: var(--pink); box-shadow: 0 4px 0 var(--pink-d);
-    font: 900 13px/1 var(--round); letter-spacing: .1em; text-transform: uppercase;
+    flex: 0 0 auto; height: 36px; padding: 0 18px; border: 0; border-radius: 12px; cursor: pointer;
+    color: #fff; background: var(--pink); box-shadow: 0 3px 0 var(--pink-d);
+    font: 900 12px/1 var(--round); letter-spacing: .1em; text-transform: uppercase;
     transition: transform .08s, box-shadow .08s, filter .15s;
   }
   .send:hover { filter: brightness(1.1); }
-  .send:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
-  .send:disabled { cursor: default; filter: none; transform: none; color: var(--dim); background: var(--panel2); box-shadow: 0 4px 0 var(--line-d); }
+  .send:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; }
+  .send:disabled { cursor: default; filter: none; transform: none; color: var(--dim); background: var(--panel2); box-shadow: 0 3px 0 var(--line-d); }
   body[data-busy="true"] .send:disabled { color: var(--yellow); }
 
-  .hint { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; padding: 0 12px 12px; color: var(--dim); font: 700 10px/1.4 var(--round); }
-  .hint kbd, .hint code {
-    padding: 2px 6px; font: 700 10px/1.3 var(--mono); color: var(--muted);
+  .hint { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 0 16px 11px; color: var(--dim); font: 700 10px/1.4 var(--round); }
+  .hint kbd { padding: 0; font: 700 10px/1.3 var(--mono); color: var(--muted); background: none; border: 0; }
+  .hint .dotsep { color: var(--line); }
+  /* chips de comando so aparecem quando o texto comeca com "/" */
+  .cmds { display: none; flex: 1 0 100%; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+  body[data-ta^="/"] .cmds { display: flex; animation: pop .22s cubic-bezier(.34, 1.56, .64, 1) both; }
+  .hint code {
+    padding: 2px 7px; font: 700 10.5px/1.3 var(--mono); color: var(--pink-t); cursor: pointer;
     background: var(--panel); border: 2px solid var(--line); border-radius: 8px; box-shadow: 0 2px 0 var(--line);
+    transition: transform .08s, box-shadow .08s, border-color .15s;
   }
-  .hint code { cursor: pointer; color: var(--pink-t); transition: transform .08s, box-shadow .08s, border-color .15s; }
   .hint code:hover { border-color: color-mix(in srgb, var(--pink) 55%, var(--line)); }
   .hint code:active { transform: translateY(2px); box-shadow: 0 0 0 transparent; }
-  .hint .sep { flex: 1 1 6px; }
 
   @media (prefers-reduced-motion: reduce) {
     .log > *, .dot.busy { animation: none; }
@@ -230,13 +238,16 @@
   <div class="log" id="log"></div>
   <div class="dock">
     <div class="composer">
-      <textarea id="ta" rows="1" placeholder="manda o que fazer no browser..."></textarea>
-      <button class="send" id="send">Exec</button>
+      <div class="field">
+        <textarea id="ta" rows="1" placeholder="manda o que fazer no browser..."></textarea>
+        <button class="send" id="send">Exec</button>
+      </div>
     </div>
     <div class="hint">
-      <kbd>Enter</kbd> envia <kbd>Shift+Enter</kbd> quebra
-      <span class="sep"></span>
-      <code>/reason</code> <code>/model</code> <code>/neon</code> <code>/clear</code> <code>/opts</code>
+      <kbd>Enter</kbd> envia <span class="dotsep">&middot;</span> <kbd>Shift+Enter</kbd> quebra <span class="dotsep">&middot;</span> <kbd>/</kbd> comandos
+      <div class="cmds">
+        <code>/reason</code> <code>/model</code> <code>/neon</code> <code>/clear</code> <code>/opts</code>
+      </div>
     </div>
   </div>
 <script type="module" src="sidepanel.js"></script>

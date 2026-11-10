@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Swarm Pilot - fixture de reconhecimento</title>
+<style>
+  body { background: #0b0c0f; color: #e5e7eb; font: 15px/1.55 ui-monospace, monospace; padding: 40px; }
+  h1 { font-size: 20px; } h2 { font-size: 15px; color: #93c5fd; }
+  button { background: #2563eb; color: #fff; border: 0; border-radius: 7px; padding: 9px 16px; font: inherit; cursor: pointer; }
+  button[disabled] { background: #1f2937; color: #6b7280; }
+  input, select { background: #16181d; color: #e5e7eb; border: 1px solid #262a32; border-radius: 6px; padding: 7px; font: inherit; }
+  table { border-collapse: collapse; margin: 10px 0; }
+  td, th { border: 1px solid #262a32; padding: 4px 10px; }
+  #wrap { position: relative; display: inline-block; }
+  /* cobre o botao de baixo: clique no centro nao chega nele */
+  #over { position: absolute; inset: -2px; background: rgba(244,114,182,.35); border: 1px dashed #f472b6; }
+  #halfwrap { position: relative; display: inline-block; }
+  #halfover { position: absolute; top: -2px; bottom: -2px; right: -2px; width: 62%; background: rgba(34,211,238,.22); border: 1px dashed #22d3ee; }
+  #far { margin-top: 2600px; }
+</style>
+</head>
+<body>
+<h1>fixture de reconhecimento</h1>
+<h2>formulario</h2>
+<form id="f">
+  <p><label for="nome">Nome completo</label> <input id="nome" name="nome" required /></p>
+  <p><input id="email" aria-labelledby="lbl-email" /><span id="lbl-email">E-mail de contato</span></p>
+  <p><input id="fone" placeholder="Telefone" /></p>
+  <p><input id="aceite" type="checkbox" checked /> <label for="aceite">Aceito os termos</label></p>
+  <p><input id="off" type="checkbox" disabled /> <label for="off">Desabilitado</label></p>
+  <p><select id="plano" name="plano"><option>starter</option><option selected>pro</option></select></p>
+  <p><button id="btn" type="button">Enviar agora</button></p>
+</form>
+<h2>sobreposicao</h2>
+<div id="wrap"><button id="under" type="button">Botao coberto</button><div id="over"></div></div>
+<div id="halfwrap"><button id="half" type="button" style="width:220px">Meio coberto</button><div id="halfover"></div></div>
+<h2>tabela</h2>
+<table><tr><th>modelo</th><th>preco</th></tr><tr><td>starter</td><td>59</td></tr><tr><td>pro</td><td>129</td></tr></table>
+<h2>estado</h2>
+<div id="alerta" role="alert"></div>
+<p id="out">contador: 0</p>
+<button id="far" type="button">longe</button>
+<script>
+  let n = 0;
+  document.getElementById('btn').addEventListener('click', () => {
+    n += 1;
+    document.getElementById('out').textContent = 'contador: ' + n;
+    const a = document.getElementById('alerta');
+    a.textContent = 'enviado ' + n;
+    const nw = document.createElement('button');
+    nw.id = 'novo' + n;
+    nw.textContent = 'novo ' + n;
+    document.getElementById('f').appendChild(nw);
+  });
+</script>
+</body>
+</html>

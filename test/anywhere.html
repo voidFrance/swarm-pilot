@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Swarm Pilot - qualquer tela</title>
+<style>
+  /* transform no body vira containing block de position:fixed: sem top layer
+     o painel deixa de ficar preso na viewport e sai da tela. */
+  body { margin: 0; transform: translate(120px, 80px) scale(0.9); transform-origin: 0 0;
+    background: #0b0c0f; color: #e5e7eb; font: 15px/1.6 ui-monospace, monospace; padding: 40px; }
+  #huge { position: fixed; inset: 0; z-index: 2147483647; background: rgba(0,0,0,0); }
+  dialog::backdrop { background: rgba(0,0,0,.75); }
+  dialog { border: 1px solid #22d3ee; border-radius: 12px; background: #101216; color: #e5e7eb;
+    padding: 24px; font: inherit; max-width: 420px; }
+  input { background: #16181d; color: #e5e7eb; border: 1px solid #262a32; border-radius: 6px; padding: 8px; font: inherit; }
+</style>
+</head>
+<body>
+<h1>qualquer tela</h1>
+<p>body com <code>transform</code> + div com z-index 2147483647 + <code>&lt;dialog&gt;</code> modal.</p>
+<input id="pagefield" placeholder="campo da pagina" />
+<p><button id="openmodal">abrir modal nativo</button></p>
+<div id="huge"></div>
+<dialog id="modal">
+  <h2>modal nativo</h2>
+  <p>enquanto aberto, tudo fora do dialogo fica inerte.</p>
+  <input id="modalfield" placeholder="campo do modal" />
+  <p><button id="closemodal">fechar</button></p>
+</dialog>
+<script>
+  window.__modalOpen = false;
+  document.getElementById('openmodal').addEventListener('click', () => {
+    document.getElementById('modal').showModal();
+    window.__modalOpen = true;
+  });
+  document.getElementById('closemodal').addEventListener('click', () => {
+    document.getElementById('modal').close();
+    window.__modalOpen = false;
+  });
+</script>
+</body>
+</html>

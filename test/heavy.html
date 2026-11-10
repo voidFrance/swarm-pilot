@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Swarm Pilot - pagina pesada</title>
+<style>
+  body { background: #0b0c0f; color: #e5e7eb; font: 13px/1.5 ui-monospace, monospace; padding: 24px; }
+  button { background: #16181d; color: #cbd5e1; border: 1px solid #262a32; border-radius: 5px; padding: 3px 6px; font: inherit; }
+  .grid { display: flex; flex-wrap: wrap; gap: 3px; }
+  .off { margin-top: 2400px; }
+</style>
+</head>
+<body>
+<h1>pagina pesada: 3000 interativos</h1>
+<div class="grid" id="g"></div>
+<div class="off"><button id="last">ultimo botao</button></div>
+<script>
+  const g = document.getElementById('g');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 3000; i++) {
+    const b = document.createElement('button');
+    b.textContent = 'b' + i;
+    b.id = 'b' + i;
+    if (i % 7 === 0) b.setAttribute('aria-label', 'rotulo ' + i);
+    frag.appendChild(b);
+  }
+  g.appendChild(frag);
+  for (let i = 0; i < 800; i++) {
+    const d = document.createElement('div');
+    d.textContent = 'linha de texto ' + i + ' com conteudo para inchar o innerText';
+    g.appendChild(d);
+  }
+  let n = 0;
+  document.getElementById('last').addEventListener('click', () => { n += 1; document.title = 'clique ' + n; });
+</script>
+</body>
+</html>

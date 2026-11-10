@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Swarm Pilot - ponteiro nao rouba eventos</title>
+<style>
+  body { background: #0b0c0f; color: #e5e7eb; font: 15px/1.6 ui-monospace, monospace; padding: 40px; }
+  button { background: #2563eb; color: #fff; border: 0; border-radius: 8px; padding: 12px 20px; font: inherit; cursor: pointer; }
+  input { background: #16181d; color: #e5e7eb; border: 1px solid #262a32; border-radius: 6px; padding: 8px; font: inherit; }
+  #out { color: #86efac; font-size: 22px; }
+</style>
+</head>
+<body>
+<h1>ponteiro nao rouba eventos</h1>
+<p>contador: <span id="out">0</span></p>
+<p><button id="btn">clique aqui</button></p>
+<p><input id="field" placeholder="campo da pagina" /></p>
+<script>
+  let n = 0;
+  document.getElementById('btn').addEventListener('click', () => {
+    n += 1;
+    document.getElementById('out').textContent = String(n);
+  });
+  window.__typed = '';
+  document.getElementById('field').addEventListener('keydown', (e) => { window.__typed += e.key; });
+</script>
+</body>
+</html>

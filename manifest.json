@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Swarm Pilot",
+  "version": "1.2.2",
+  "description": "Agente de browser na barra lateral: reconhecimento por ref a11y, raciocinio visivel, ponteiro neon unico e clique real via CDP. Qualquer modelo (OpenAI-compat ou Anthropic).",
+  "minimum_chrome_version": "116",
+  "permissions": ["debugger", "tabs", "storage", "scripting", "activeTab", "sidePanel"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "side_panel": { "default_path": "sidepanel.html" },
+  "action": { "default_title": "Swarm Pilot (Alt+Shift+K)" },
+  "commands": {
+    "toggle-panel": {
+      "suggested_key": { "default": "Alt+Shift+K" },
+      "description": "Abrir a barra lateral do Swarm Pilot"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/pointer.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Swarm Pilot - alvo de teste</title>
+<style>
+  body { background: #0b0c0f; color: #e5e7eb; font: 16px/1.6 ui-monospace, monospace; padding: 48px; }
+  h1 { font-size: 20px; }
+  button { background: #2563eb; color: #fff; border: 0; border-radius: 8px; padding: 12px 20px; font: inherit; cursor: pointer; }
+  button:hover { background: #1d4ed8; }
+  #out { font-size: 34px; color: #86efac; margin: 10px 0; }
+  .box { border: 1px solid #22252c; border-radius: 10px; padding: 24px; max-width: 520px; background: #101216; }
+  input { background: #16181d; color: #e5e7eb; border: 1px solid #262a32; border-radius: 7px; padding: 10px; font: inherit; width: 100%; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>alvo de teste</h1>
+  <p>contador: <span id="out">0</span></p>
+  <p><button id="btn">click me</button></p>
+  <p><input id="field" placeholder="digite aqui" /></p>
+  <p id="echo" style="color:#93c5fd"></p>
+</div>
+<script>
+  let n = 0;
+  document.getElementById('btn').addEventListener('click', () => {
+    n += 1;
+    document.getElementById('out').textContent = String(n);
+  });
+  document.getElementById('field').addEventListener('input', (e) => {
+    document.getElementById('echo').textContent = 'echo: ' + e.target.value;
+  });
+</script>
+</body>
+</html>

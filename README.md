@@ -212,3 +212,12 @@ content/pointer.js     ponteiro neon no top layer (unico script injetado na pagi
 options.html/js        provedor, perfil, advisor, reasoning (low), ponteiro, visao; sem campo de passos
 test/                  harness + model, ground, options, keys, anywhere, perf, e2e, task
 ```
+
+## Seguranca
+
+Modelo de ameaca, permissoes e o que a extensao faz em seu nome: `SECURITY.md`. Resumo:
+
+- Sem chave no repositorio: cole a sua em OPCOES.
+- `baseUrl` tem de ser `https:` (ou `http:` em loopback); `endpointBase()` recusa o resto.
+- `evaluate` e `fetch_url` rodam com os cookies da aba (`credentials: include`): texto de pagina
+  e entrada hostil. `stop` no painel corta o turno.

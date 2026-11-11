@@ -55,7 +55,8 @@ try {
   })`);
   const d = JSON.parse(dom);
   ok(d.agentes >= 8, "presets de provedor no seletor", d.agentes);
-  ok(d.baseUrl.startsWith("http") && d.modelo.length > 0 && d.chave, "perfil hidratado", d.modelo);
+  ok(d.baseUrl.startsWith("https://") && d.modelo.length > 0, "perfil hidratado", d.modelo + " @ " + d.baseUrl);
+  ok(d.chave === false, "nenhuma chave embutida no perfil novo", String(d.chave));
   ok(d.effort === "low", "effort low e o padrao da tela", d.effort);
   ok(d.semCampoPassos, "sem campo de limite de passos", d.inputs + " inputs");
 

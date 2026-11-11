@@ -154,7 +154,9 @@ function handle(msg) {
       b.dataset.kind = KIND[msg.tool] || "act";
       const s = document.createElement("span");
       s.className = "res";
-      s.textContent = JSON.stringify(msg.args || {}).slice(0, 180);
+      const args = msg.args || {};
+      // o resumo do done e a propria conclusao: mostrar o texto, nao o JSON
+      s.textContent = (msg.tool === "done" && args.summary ? String(args.summary) : JSON.stringify(args)).slice(0, 180);
       el.append(b, s);
       card.append(el);
       logEl.appendChild(card);
@@ -201,6 +203,8 @@ function handle(msg) {
       if (!msg.text) break;
       if (!assistantEl) assistantEl = addEl("msg assistant", "");
       assistantEl.textContent = msg.text;
+      // a conclusao fecha a conversa: se passos vieram depois do stream, desce ela para o fim
+      if (assistantEl !== logEl.lastElementChild) logEl.append(assistantEl);
       assistantEl = null;
       logEl.scrollTop = logEl.scrollHeight;
       break;

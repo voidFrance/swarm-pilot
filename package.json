@@ -1,6 +1,6 @@
 {
   "name": "swarm-pilot",
-  "version": "1.1.0",
+  "version": "1.2.2",
   "private": true,
   "type": "module",
   "description": "Extensao Chrome que dirige o browser real via CDP: reconhecimento por ref a11y e ponteiro neon unico.",
